@@ -1,6 +1,6 @@
 <?php
 
-namespace Cryomagma\SlugifyColumn;
+namespace AnthonyDee\SlugifyColumn;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;

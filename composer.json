@@ -25,12 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Cryomagma\\SlugifyColumn\\": "src"
+            "AnthonyDee\\SlugifyColumn\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Cryomagma\\SlugifyColumn\\Tests\\": "tests"
+            "AnthonyDee\\SlugifyColumn\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -44,10 +44,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Cryomagma\\SlugifyColumn\\SlugifyColumnServiceProvider"
+                "AnthonyDee\\SlugifyColumn\\SlugifyColumnServiceProvider"
             ],
             "aliases": {
-                "SlugifyColumn": "Cryomagma\\SlugifyColumn\\SlugifyColumnFacade"
+                "SlugifyColumn": "AnthonyDee\\SlugifyColumn\\SlugifyColumnFacade"
             }
         }
     }
