@@ -1,6 +1,6 @@
 {
     "name": "anthony-dee/slugify-column",
-    "description": "Artisan command that takes a table and column name and slugifies the values into an output column",
+    "description": "An artisan command that takes a table and column name and slugifies the values into an output column",
     "keywords": [
         "anthony-dee",
         "slugify-column"
