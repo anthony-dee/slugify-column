@@ -51,7 +51,7 @@ class SlugifyColumn extends Command
         DB::table($this->table)->chunkById(100, function ($rows) {
           foreach ($rows as $row) {
               $id = $row->{$this->idColumn};
-              $input = $value->{$this->inputColumn};
+              $input = $row->{$this->inputColumn};
               $slug = Str::slug($input);
 
               $result = $this->slugifyColumn($id, $slug);
