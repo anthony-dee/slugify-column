@@ -8,6 +8,10 @@ use Illuminate\Support\Str;
 
 class SlugifyColumn extends Command
 {
+    private $table;
+    private $idColumn;
+    private $inputColumn;
+    private $outputColumn;
     /**
      * The name and signature of the console command.
      *
@@ -39,24 +43,42 @@ class SlugifyColumn extends Command
      */
     public function handle()
     {
-        $table = $this->argument('table');
-        $idCol = $this->argument('id-column');
-        $inputCol = $this->argument('input-column');
-        $outputCol = $this->argument('output-column');
+        $this->table = $this->argument('table');
+        $this->idColumn = $this->argument('id-column');
+        $this->inputColumn = $this->argument('input-column');
+        $this->outputColumn = $this->argument('output-column');
 
         DB::table($table)->chunkById(100, function ($rows) {
           foreach ($rows as $row) {
-              DB::table($table)
-                  ->where($idCol, $user->{$idCol})
-                  ->update([$outputCol => Str::slug($row->{$inputCol})]);
+              $id = $row->{$this->idColumn};
+              $input = $value->{$this->inputColumn};
+              $slug = Str::slug($input);
+
+              $result = $this->slugifyColumn($id, $slug);
 
               if ($result) {
-                  $this->info('Updated ' . $table . ' ' . $outputCol . '. Slug:  '  . $slug);
+                $this->printInfo($slug);
               } else {
-                $this->error('Something went wrong! ID: ' . $id . ' Input value: ' . $input);
+                $this->printError($id, $input);
                 break;
               }
           }
         });
+    }
+
+    private function printInfo($slug) {
+      $this->info('Updated ' . $this->table . ' ' . $this->outputColumn . '. Slug:  '  . $slug);
+    }
+
+    private function printError($id, $input) {
+      $this->error('Something went wrong! ID: ' . $id . ' Input value: ' . $input);
+    }
+
+    private function slugifyColumn($id, $slug) {
+      return DB::table($this->table)
+          ->where($this->idColumn, $id)
+          ->update([
+            $this->outputCol => $slug
+          ]);
     }
 }
