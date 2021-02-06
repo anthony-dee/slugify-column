@@ -78,7 +78,7 @@ class SlugifyColumn extends Command
       return DB::table($this->table)
           ->where($this->idColumn, $id)
           ->update([
-            $this->outputCol => $slug
+            $this->outputColumn => $slug
           ]);
     }
 }
