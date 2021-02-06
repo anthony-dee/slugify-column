@@ -48,7 +48,7 @@ class SlugifyColumn extends Command
         $this->inputColumn = $this->argument('input-column');
         $this->outputColumn = $this->argument('output-column');
 
-        DB::table($table)->chunkById(100, function ($rows) {
+        DB::table($this->table)->chunkById(100, function ($rows) {
           foreach ($rows as $row) {
               $id = $row->{$this->idColumn};
               $input = $value->{$this->inputColumn};
