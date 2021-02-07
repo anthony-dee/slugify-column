@@ -12,6 +12,8 @@ class SlugifyColumn extends Command
     private $idColumn;
     private $inputColumn;
     private $outputColumn;
+    private $chunk;
+
     /**
      * The name and signature of the console command.
      *
@@ -47,8 +49,9 @@ class SlugifyColumn extends Command
         $this->idColumn = $this->argument('id-column');
         $this->inputColumn = $this->argument('input-column');
         $this->outputColumn = $this->argument('output-column');
+        $this->chunk = $this->option('chunk');
 
-        DB::table($this->table)->chunkById(100, function ($rows) {
+        DB::table($this->table)->chunkById($this->chunk, function ($rows) {
           foreach ($rows as $row) {
               $id = $row->{$this->idColumn};
               $input = $row->{$this->inputColumn};
