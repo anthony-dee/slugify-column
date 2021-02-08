@@ -2,13 +2,14 @@
 
 namespace AnthonyDee\SlugifyColumn;
 
+use Mavinoo\Batch\Batch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class SlugifyColumn extends Command
 {
-    private $table;
+    private $tableModel;
     private $idColumn;
     private $inputColumn;
     private $outputColumn;
@@ -45,27 +46,47 @@ class SlugifyColumn extends Command
      */
     public function handle()
     {
-        $this->table = $this->argument('table');
+        $table = $this->argument('table');
+
+        if (class_exists($table)) {
+            $this->tableModel = new $table();
+        } else {
+          $this->error('A model class for ' . $table . ' does not exist.');
+          return false;
+        }
+
         $this->idColumn = $this->argument('id-column');
         $this->inputColumn = $this->argument('input-column');
         $this->outputColumn = $this->argument('output-column');
         $this->chunk = $this->option('chunk');
 
         DB::table($this->table)->chunkById($this->chunk, function ($rows) {
+          $updates = [];
           foreach ($rows as $row) {
-              $id = $row->{$this->idColumn};
-              $input = $row->{$this->inputColumn};
-              $slug = Str::slug($input);
-
-              $result = $this->slugifyColumn($id, $slug);
-
-              if ($result) {
-                $this->printInfo($slug);
-              } else {
-                $this->printError($id, $input);
-                break;
-              }
+            $input = $row->{$this->inputColumn};
+            $slug = Str::slug($input);
+            $updates[] = [
+              $this->idColumn => $row->{$this->idColumn},
+              $this->outputColumn => $slug
+            ];
           }
+          
+          Batch::update($this->tableModel, $updates, $this->idColumn);
+
+          // foreach ($rows as $row) {
+          //     $id = $row->{$this->idColumn};
+          //     $input = $row->{$this->inputColumn};
+          //     $slug = Str::slug($input);
+          //
+          //     $result = $this->slugifyColumn($id, $slug);
+          //
+          //     if ($result) {
+          //       $this->printInfo($slug);
+          //     } else {
+          //       $this->printError($id, $input);
+          //       break;
+          //     }
+          // }
         });
     }
 
