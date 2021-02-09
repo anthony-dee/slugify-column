@@ -20,7 +20,7 @@ class SlugifyColumn extends Command
      *
      * @var string
      */
-    protected $signature = 'slugify {table} {id-column} {input-column} {output-column} {--chunk=100}';
+    protected $signature = 'slugify {tableModel} {id-column} {input-column} {output-column} {--chunk=100}';
 
     /**
      * The console command description.
@@ -46,12 +46,12 @@ class SlugifyColumn extends Command
      */
     public function handle()
     {
-        $table = $this->argument('table');
+        $modelName = $this->argument('tableModel');
 
-        if (class_exists($table)) {
-            $this->tableModel = new $table();
+        if (class_exists($modelName)) {
+            $this->tableModel = new $modelName();
         } else {
-          $this->error('A model class for ' . $table . ' does not exist.');
+          $this->error('A model class for ' . $modelName . ' does not exist.');
           return false;
         }
 
