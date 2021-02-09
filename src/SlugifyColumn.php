@@ -2,6 +2,7 @@
 
 namespace AnthonyDee\SlugifyColumn;
 
+use App\Brewery;
 use Mavinoo\Batch\Batch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -48,19 +49,23 @@ class SlugifyColumn extends Command
     {
         $modelName = $this->argument('tableModel');
 
-        if (class_exists($modelName)) {
-            $this->tableModel = new $modelName();
-        } else {
-          $this->error('A model class for ' . $modelName . ' does not exist.');
-          return false;
-        }
+        //include($modelName . '.php');
+
+        // if (class_exists($modelName)) {
+        //     $this->tableModel = new $modelName();
+        // } else {
+        //   $this->error('A model class for ' . $modelName . ' does not exist.');
+        //   return false;
+        // }
+
+        $this->tableModel = new Brewery();
 
         $this->idColumn = $this->argument('id-column');
         $this->inputColumn = $this->argument('input-column');
         $this->outputColumn = $this->argument('output-column');
         $this->chunk = $this->option('chunk');
 
-        DB::table($this->table)->chunkById($this->chunk, function ($rows) {
+        DB::table('breweries')->chunkById($this->chunk, function ($rows) {
           $updates = [];
           foreach ($rows as $row) {
             $input = $row->{$this->inputColumn};
@@ -71,7 +76,7 @@ class SlugifyColumn extends Command
             ];
           }
 
-          Batch::update($this->tableModel, $updates, $this->idColumn);
+          batch()->update($this->tableModel, $updates, $this->idColumn);
 
           // foreach ($rows as $row) {
           //     $id = $row->{$this->idColumn};
