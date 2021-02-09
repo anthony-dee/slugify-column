@@ -2,7 +2,7 @@
 
 namespace AnthonyDee\SlugifyColumn;
 
-use App\Brewery;
+use App;
 use Mavinoo\Batch\Batch;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -58,14 +58,14 @@ class SlugifyColumn extends Command
         //   return false;
         // }
 
-        $this->tableModel = new Brewery();
+        $this->tableModel = App::make('App/' . $modelName);
 
         $this->idColumn = $this->argument('id-column');
         $this->inputColumn = $this->argument('input-column');
         $this->outputColumn = $this->argument('output-column');
         $this->chunk = $this->option('chunk');
 
-        DB::table('breweries')->chunkById($this->chunk, function ($rows) {
+        $this->tableModel->chunkById($this->chunk, function ($rows) {
           $updates = [];
           foreach ($rows as $row) {
             $input = $row->{$this->inputColumn};
