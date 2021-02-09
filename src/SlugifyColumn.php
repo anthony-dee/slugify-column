@@ -20,7 +20,7 @@ class SlugifyColumn extends Command
      *
      * @var string
      */
-    protected $signature = 'slugify {table} {id-column} {input-column} {output-column}';
+    protected $signature = 'slugify {table} {id-column} {input-column} {output-column} {--chunk=100}';
 
     /**
      * The console command description.
@@ -70,7 +70,7 @@ class SlugifyColumn extends Command
               $this->outputColumn => $slug
             ];
           }
-          
+
           Batch::update($this->tableModel, $updates, $this->idColumn);
 
           // foreach ($rows as $row) {
