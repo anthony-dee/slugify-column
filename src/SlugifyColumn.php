@@ -15,6 +15,7 @@ class SlugifyColumn extends Command
     private $inputColumn;
     private $outputColumn;
     private $chunk;
+    private $count = 0;
 
     /**
      * The name and signature of the console command.
@@ -47,67 +48,45 @@ class SlugifyColumn extends Command
      */
     public function handle()
     {
-        $modelName = $this->argument('tableModel');
-
-        //include($modelName . '.php');
-
-        // if (class_exists($modelName)) {
-        //     $this->tableModel = new $modelName();
-        // } else {
-        //   $this->error('A model class for ' . $modelName . ' does not exist.');
-        //   return false;
-        // }
-
-        $this->tableModel = App::make('App/' . $modelName);
-
+        $this->tableModel = App::make("App\\{$this->argument('tableModel')}");
         $this->idColumn = $this->argument('id-column');
         $this->inputColumn = $this->argument('input-column');
         $this->outputColumn = $this->argument('output-column');
         $this->chunk = $this->option('chunk');
 
-        $this->tableModel->chunkById($this->chunk, function ($rows) {
-          $updates = [];
-          foreach ($rows as $row) {
-            $input = $row->{$this->inputColumn};
-            $slug = Str::slug($input);
-            $updates[] = [
-              $this->idColumn => $row->{$this->idColumn},
-              $this->outputColumn => $slug
-            ];
-          }
-
-          batch()->update($this->tableModel, $updates, $this->idColumn);
-
-          // foreach ($rows as $row) {
-          //     $id = $row->{$this->idColumn};
-          //     $input = $row->{$this->inputColumn};
-          //     $slug = Str::slug($input);
-          //
-          //     $result = $this->slugifyColumn($id, $slug);
-          //
-          //     if ($result) {
-          //       $this->printInfo($slug);
-          //     } else {
-          //       $this->printError($id, $input);
-          //       break;
-          //     }
-          // }
+        $this->tableModel->chunkById($this->chunk, function ($chunk) {
+          $this->runChunkUpdate(
+            $this->processChunkUpdate($chunk)
+          );
         });
+
+        $this->info($this->count . ' fields in the "' . $this->inputColumn . '" column were slugified.');
     }
 
-    private function printInfo($slug) {
-      $this->info('Updated ' . $this->table . ' ' . $this->outputColumn . '. Slug:  '  . $slug);
+    private function processChunkUpdate($chunk) {
+      $updates = [];
+
+      foreach ($chunk as $row) {
+        $input = $row->{$this->inputColumn};
+        $slug = Str::slug($input);
+        $updates[] = [
+          $this->idColumn => $row->{$this->idColumn},
+          $this->outputColumn => $slug
+        ];
+
+        $this->incrementCount();
+      }
+
+      return $updates;
     }
 
-    private function printError($id, $input) {
-      $this->error('Something went wrong! ID: ' . $id . ' Input value: ' . $input);
+    private function runChunkUpdate($updates)
+    {
+      batch()->update($this->tableModel, $updates, $this->idColumn);
     }
 
-    private function slugifyColumn($id, $slug) {
-      return DB::table($this->table)
-          ->where($this->idColumn, $id)
-          ->update([
-            $this->outputColumn => $slug
-          ]);
+    private function incrementCount()
+    {
+      $this->count++;
     }
 }
